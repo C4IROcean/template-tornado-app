@@ -70,6 +70,8 @@ jobs:
         displayName: Install and update PIP
       - script: python -m pip install poetry
         displayName: Install and Poetry
+      - script: cd ../app-deployer && poetry install
+        displayName: Install dependencies
       - script: cd $(Build.SourcesDirectory) && ls -lA ..
         displayName: List stuff
 
