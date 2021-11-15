@@ -52,6 +52,7 @@ jobs:
 #    dependsOn: Build
     variables:
       environment: dev
+      vault_name: kv-dev-main
     steps:
       - checkout: self
         fetchDepth: 3
@@ -63,6 +64,13 @@ jobs:
       - script: echo "##vso[task.setvariable variable=environment]prod"
         displayName: Set environment tag to PROD
         condition: or(eq(variables.isMaster, true), eq(variables.isTag, true))
+      - script: echo "##vso[task.setvariable variable=vault_name]kv-${ENVIRONMENT}-main"
+        displayName: Set Azure Vault name
+      - task: AzureKeyVault@1
+        inputs:
+          azureSubscription: $(azure_subsription)
+          KeyVaultName: $(vault_name)
+          SecretsFilter: "eas-*"
       - task: UsePythonVersion@0
         inputs:
           versionSpec: "3.9"
