@@ -12,6 +12,9 @@ pool:
 
 variables:
   dockerRegistryServiceConnection: 'd46a8808-46ca-4d98-8cf4-ec41c18db25b'
+  ${{ if eq(variables['Build.Reason'], 'Manual') }}:
+    imageTag: null
+    deployEnvironment: prod
   ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
     imageTag: null
     deployEnvironment: prod
