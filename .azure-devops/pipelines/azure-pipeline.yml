@@ -11,10 +11,10 @@ pool:
   vmImage: "ubuntu-latest"
 
 variables:
-  dockerRegistryServiceConnection: 'd46a8808-46ca-4d98-8cf4-ec41c18db25b'
+  docker_registry_service_connection: 'd46a8808-46ca-4d98-8cf4-ec41c18db25b'
   isMaster: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))]
   isTag: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
-  imageTag: dev
+  image_tag: dev
   environment: dev
 
 jobs:
@@ -26,16 +26,16 @@ jobs:
       - script: "##vso[task.setvariable variable=environment]prod"
         displayName: Set environment to PROD
         condition: eq(variables.isTag, true)
-      - script: VERSION_TAG=`git describe --tags` && echo "##vso[task.setvariable variable=imageTag]$VERSION_TAG"
+      - script: VERSION_TAG=`git describe --tags` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
         displayName: Set image image tag to latest git tag
         condition: eq(variables.isTag, true)
-      - script: "##vso[task.setvariable variable=imageTag]latest"
+      - script: "##vso[task.setvariable variable=image_tag]latest"
         displayName: Set image tag to latest
         condition: eq(variables.isMaster, true)
-      - script: VERSION_TAG=`git rev-parse --short HEAD` && echo "##vso[task.setvariable variable=imageTag]$VERSION_TAG"
+      - script: VERSION_TAG=`git rev-parse --short HEAD` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
         displayName: Set the git tag to git hash
         condition: and(eq(variables.isTag, false), eq(variables.isMaster, false))
-      - script: echo "----> $[imageTag]"
+      - script: echo "----> $IMAGE_TAG"
         displayName: Print image tag
 
       - task: Docker@2
@@ -44,7 +44,7 @@ jobs:
           command: buildAndPush
           repository: $(Build.SourcesDirectory)
           dockerfile: $(Build.SourcesDirectory)/Dockerfile
-          containerRegistry: $(dockerRegistryServiceConnection)
+          containerRegistry: $(docker_registry_service_connection)
           tags: |
-            $(imageTag)
+            $(image_tag)
             $(Build.BuildId)
