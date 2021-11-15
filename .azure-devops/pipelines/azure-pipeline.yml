@@ -46,5 +46,5 @@ jobs:
           dockerfile: $(Build.SourcesDirectory)/Dockerfile
           containerRegistry: $(docker_registry_service_connection)
           tags: |
-            ${{image_tag}}
+            ${{variables.image_tag}}
             $(Build.BuildId)
