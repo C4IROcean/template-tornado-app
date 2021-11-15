@@ -5,7 +5,8 @@ metadata:
   namespace: app-template
 spec:
   service:
-    - host: "app-template.{env}.oceandata.xyz"
+    - name: example
+      host: "app-template.{env}.oceandata.xyz"
       port: 80
       image:
         name: oceandata.azurecr.io/app-deployer

@@ -12,36 +12,36 @@ pool:
 
 variables:
   dockerRegistryServiceConnection: 'd46a8808-46ca-4d98-8cf4-ec41c18db25b'
-  ${{ if eq(variables['Build.Reason'], 'Manual') }}:
-    imageTag: null
-    deployEnvironment: prod
-  ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
-    imageTag: null
-    deployEnvironment: prod
-  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
-    imageTag: $[variables['Build.SourceBranchName']]
-    deployEnvironment: dev
-  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/') }}:
-    imageTag: $[variables['Build.SourceBranchName']]
-    deployEnvironment: dev
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  isTag: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
+  imageTag: dev
+  environment: dev
 
+jobs:
+  - job: Build
+    steps:
+      - checkout: self
+        fetchDepth: 3
+        clean: true
+      - script: "##vso[task.setvariable variable=environment]prod"
+        displayName: Set the git tag name as environment variable
+        condition: eq(variables.isTag, true)
+      - script: VERSION_TAG=`git describe --tags` && echo "##vso[task.setvariable variable=imageTag]$VERSION_TAG"
+        displayName: Set the git tag name as environment variable
+        condition: eq(variables.isTag, true)
+      - script: "##vso[task.setvariable variable=imageTag]latest"
+        displayName: Set the git tag name as environment variable
+        condition: eq(variables.isMaster, true)
+      - script: VERSION_TAG=`git rev-parse --short HEAD` && echo "##vso[task.setvariable variable=imageTag]$VERSION_TAG"
+        displayName: Set the git tag name as environment variable
+        condition: and(eq(variables.isTag, false), eq(variables.isMaster, true))
 
-steps:
-  - checkout: self
-    fetchDepth: 3
-    clean: true
-  - script: VERSION_TAG=`git describe --tags` && echo "##vso[task.setvariable variable=VERSION_TAG]$VERSION_TAG"
-    displayName: Set the git tag name as environment variable
-  - script: "IMAGE_TAG=${ ${{parameters.imageTag}}:${VERSION_TAG} }"
-    displayName: Set the Docker image tag
-  - script: "echo $IMAGE_TAG"
-    displayName: Display image tag
-  - task: Docker@2
-    displayName: Build image to container registry
-    inputs:
-      command: buildAndPush
-      repository: $(Build.SourcesDirectory)
-      dockerfile: $(Build.SourcesDirectory)/Dockerfile
-      containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
-      tags: |
-        $( IMAGE_TAG )
+      - task: Docker@2
+        displayName: Build image to container registry
+        inputs:
+          command: buildAndPush
+          repository: $(Build.SourcesDirectory)
+          dockerfile: $(Build.SourcesDirectory)/Dockerfile
+          containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
+          tags: |
+            $( imageTag )
