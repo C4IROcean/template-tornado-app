@@ -12,7 +12,8 @@ pool:
 
 
 variables:
-  docker_registry_service_connection: 'd46a8808-46ca-4d98-8cf4-ec41c18db25b'
+  docker_registry_service_connection: "d46a8808-46ca-4d98-8cf4-ec41c18db25b"
+  azure_subsription_connection: "4a0dc9a4-3e6b-4da2-8c65-8a1cefc85065"
   docker_repository: oceandata.azurecr.io/app-template
   isMaster: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))]
   isTag: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
@@ -68,7 +69,7 @@ jobs:
         displayName: Set Azure Vault name
       - task: AzureKeyVault@1
         inputs:
-          azureSubscription: $(azure_subsription)
+          azureSubscription: $(azure_subsription_connection)
           KeyVaultName: $(vault_name)
           SecretsFilter: "eas-*"
       - task: UsePythonVersion@0
