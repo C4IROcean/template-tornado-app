@@ -10,43 +10,56 @@ trigger:
 pool:
   vmImage: "ubuntu-latest"
 
+
 variables:
   docker_registry_service_connection: 'd46a8808-46ca-4d98-8cf4-ec41c18db25b'
   docker_repository: oceandata.azurecr.io/app-template
   isMaster: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))]
   isTag: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
-  environment: dev
 
 jobs:
-  - job: Build
+#   - job: Build
+#     variables:
+#       image_tag: dev
+#     steps:
+#       - checkout: self
+#         fetchDepth: 3
+#         clean: true
+#       - script: echo "##vso[task.setvariable variable=environment]prod"
+#         displayName: Set environment to PROD
+#         condition: eq(variables.isTag, true)
+#       - script: VERSION_TAG=`git describe --tags` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
+#         displayName: Set image image tag to latest git tag
+#         condition: eq(variables.isTag, true)
+#       - script: echo "##vso[task.setvariable variable=image_tag]latest"
+#         displayName: Set image tag to latest
+#         condition: eq(variables.isMaster, true)
+#       - script: VERSION_TAG=`git rev-parse --short HEAD` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
+#         displayName: Set the git tag to git hash
+#         condition: and(eq(variables.isTag, false), eq(variables.isMaster, false))
+#
+#       - task: Docker@2
+#         displayName: Build image to container registry
+#         inputs:
+#           command: buildAndPush
+#           repository: $(docker_repository)
+#           dockerfile: $(Build.SourcesDirectory)/Dockerfile
+#           containerRegistry: $(docker_registry_service_connection)
+#           tags: |
+#             $(image_tag)
+#             $(Build.BuildId)
+  - job: Deploy
+#    dependsOn: Build
     variables:
-      image_tag: dev
+      environment: dev
     steps:
       - checkout: self
         fetchDepth: 3
         clean: true
-      - script: echo "##vso[task.setvariable variable=environment]prod"
-        displayName: Set environment to PROD
-        condition: eq(variables.isTag, true)
-      - script: VERSION_TAG=`git describe --tags` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
-        displayName: Set image image tag to latest git tag
-        condition: eq(variables.isTag, true)
-      - script: echo "##vso[task.setvariable variable=image_tag]latest"
-        displayName: Set image tag to latest
-        condition: eq(variables.isMaster, true)
-      - script: VERSION_TAG=`git rev-parse --short HEAD` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
-        displayName: Set the git tag to git hash
-        condition: and(eq(variables.isTag, false), eq(variables.isMaster, false))
-      - script: echo "----> $IMAGE_TAG"
-        displayName: Print image tag
+        path: src
+      - checkout: git://ODP/app-deployer
+        clean: true
+        path: app-deployer
+      - script: cd $(Build.SourcesDirectory) && ls
+        displayName: List stuff
 
-      - task: Docker@2
-        displayName: Build image to container registry
-        inputs:
-          command: buildAndPush
-          repository: $(docker_repository)
-          dockerfile: $(Build.SourcesDirectory)/Dockerfile
-          containerRegistry: $(docker_registry_service_connection)
-          tags: |
-            $(image_tag)
-            $(Build.BuildId)
