@@ -12,7 +12,7 @@ pool:
 
 variables:
   dockerRegistryServiceConnection: 'd46a8808-46ca-4d98-8cf4-ec41c18db25b'
-  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  isMaster: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   isTag: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
   imageTag: dev
   environment: dev
