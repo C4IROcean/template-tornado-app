@@ -47,3 +47,4 @@ jobs:
           containerRegistry: $(dockerRegistryServiceConnection)
           tags: |
             $(imageTag)
+            $(Build.BuildId)
