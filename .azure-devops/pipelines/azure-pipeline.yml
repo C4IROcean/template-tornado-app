@@ -34,7 +34,7 @@ jobs:
         condition: eq(variables.isMaster, true)
       - script: VERSION_TAG=`git rev-parse --short HEAD` && echo "##vso[task.setvariable variable=imageTag]$VERSION_TAG"
         displayName: Set the git tag to git hash
-        condition: and(eq(variables.isTag, false), eq(variables.isMaster, true))
+        condition: and(eq(variables.isTag, false), eq(variables.isMaster, false))
 
       - task: Docker@2
         displayName: Build image to container registry
@@ -44,4 +44,4 @@ jobs:
           dockerfile: $(Build.SourcesDirectory)/Dockerfile
           containerRegistry: $(dockerRegistryServiceConnection)
           tags: |
-            $(imageTag.value)
+            $(imageTag)
