@@ -24,16 +24,16 @@ jobs:
         fetchDepth: 3
         clean: true
       - script: "##vso[task.setvariable variable=environment]prod"
-        displayName: Set the git tag name as environment variable
+        displayName: Set environment to PROD
         condition: eq(variables.isTag, true)
       - script: VERSION_TAG=`git describe --tags` && echo "##vso[task.setvariable variable=imageTag]$VERSION_TAG"
-        displayName: Set the git tag name as environment variable
+        displayName: Set image image tag to latest git tag
         condition: eq(variables.isTag, true)
       - script: "##vso[task.setvariable variable=imageTag]latest"
-        displayName: Set the git tag name as environment variable
+        displayName: Set image tag to latest
         condition: eq(variables.isMaster, true)
       - script: VERSION_TAG=`git rev-parse --short HEAD` && echo "##vso[task.setvariable variable=imageTag]$VERSION_TAG"
-        displayName: Set the git tag name as environment variable
+        displayName: Set the git tag to git hash
         condition: and(eq(variables.isTag, false), eq(variables.isMaster, true))
 
       - task: Docker@2
@@ -44,4 +44,4 @@ jobs:
           dockerfile: $(Build.SourcesDirectory)/Dockerfile
           containerRegistry: $(dockerRegistryServiceConnection)
           tags: |
-            $(imageTag)
+            $(imageTag.value)
