@@ -1,0 +1,44 @@
+trigger:
+  branches:
+    include:
+      - 'feature/*'
+      - 'master'
+  tags:
+    include:
+      - '*'
+
+pool:
+  vmImage: "ubuntu-latest"
+
+variables:
+  dockerRegistryServiceConnection: 'd46a8808-46ca-4d98-8cf4-ec41c18db25b'
+  ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+    imageTag: null
+    deployEnvironment: prod
+  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
+    imageTag: $[variables['Build.SourceBranchName']]
+    deployEnvironment: dev
+  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/feature/') }}:
+    imageTag: $[variables['Build.SourceBranchName']]
+    deployEnvironment: dev
+
+
+steps:
+  - checkout: self
+    fetchDepth: 3
+    clean: true
+  - script: VERSION_TAG=`git describe --tags` && echo "##vso[task.setvariable variable=VERSION_TAG]$VERSION_TAG"
+    displayName: Set the git tag name as environment variable
+  - script: "IMAGE_TAG=${ ${{parameters.imageTag}}:${VERSION_TAG} }"
+    displayName: Set the Docker image tag
+  - script: "echo $IMAGE_TAG"
+    displayName: Display image tag
+  - task: Docker@2
+    displayName: Build image to container registry
+    inputs:
+      command: buildAndPush
+      repository: $(Build.SourcesDirectory)
+      dockerfile: $(Build.SourcesDirectory)/Dockerfile
+      containerRegistry: ${{ parameters.dockerRegistryServiceConnection }}
+      tags: |
+        $( IMAGE_TAG )

@@ -1,0 +1,15 @@
+apiVersion: earth.oceandata/v1alpha1
+kind: Application
+metadata:
+  name: app-template
+  namespace: app-template
+spec:
+  service:
+    - host: "app-template.{env}.oceandata.xyz"
+      port: 80
+      image:
+        name: oceandata.azurecr.io/app-deployer
+        tag: "{image_tag}"
+      resources:
+        cpu: 100m
+        memory: 64Mi
