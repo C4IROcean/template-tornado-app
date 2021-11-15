@@ -42,6 +42,6 @@ jobs:
           command: buildAndPush
           repository: $(Build.SourcesDirectory)
           dockerfile: $(Build.SourcesDirectory)/Dockerfile
-          containerRegistry: $( variables.dockerRegistryServiceConnection )
+          containerRegistry: $(dockerRegistryServiceConnection)
           tags: |
-            $( variables.imageTag )
+            $(imageTag)
