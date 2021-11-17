@@ -11,7 +11,7 @@ spec:
       - "27d04248-2ca5-45ee-903c-2d89a7652b5a"
   service:
     - name: whoami
-      host: "whoami123.{env}.oceandata.xyz"
+      host: "whoami.{env}.oceandata.xyz"
       port: 80
       image:
         name: traefik/whoami
