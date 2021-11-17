@@ -93,7 +93,7 @@ jobs:
       - script: cd ../app-deployer && poetry run python -m odp.app.deployer -f ../src/deployment_config.yml
         displayName: Deploy app
         env:
-          ENV_NAME: $(environment)
+          ENVIRONMENT: $(environment)
           IMAGE_TAG: latest
           PROXY_SSL_DOMAIN: "*.$(environment).oceandata.xyz"
           PROXY_CERT_RESOLVER: letsencrypt
