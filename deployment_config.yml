@@ -4,12 +4,17 @@ metadata:
   name: app-template
   namespace: app-template
 spec:
+  auth:
+    enabled: true
+    app_id: "2a18c352-e7ab-4437-96df-6036d815b3fc"
+    group_ids:
+      - "27d04248-2ca5-45ee-903c-2d89a7652b5a"
   service:
     - name: example
       host: "app-template.{env}.oceandata.xyz"
       port: 80
       image:
-        name: oceandata.azurecr.io/app-deployer
+        name: oceandata.azurecr.io/app-template
         tag: "{image_tag}"
       resources:
         cpu: 100m
