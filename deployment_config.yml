@@ -10,11 +10,11 @@ spec:
     group_ids:
       - "27d04248-2ca5-45ee-903c-2d89a7652b5a"
   service:
-    - name: whoami
-      host: "whoami.{env}.oceandata.xyz"
+    - name: app-template
+      host: "example.{env}.oceandata.xyz"
       port: 80
       image:
-        name: traefik/whoami
+        name: traefik/app-template
         tag: latest
       resources:
         cpu: 100m
