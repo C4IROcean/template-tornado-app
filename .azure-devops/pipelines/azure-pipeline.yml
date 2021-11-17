@@ -80,7 +80,9 @@ jobs:
         inputs:
           azureSubscription: $(azure_subsription_connection)
           KeyVaultName: $(vault_name)
-          SecretsFilter: "eas-config-token-encrypt,eas-config-token-sign,eas-cookie-encrypt,eas-cookie-sign,eas-issuer-encrypt,eas-issuer-sign,eas-session-encrypt"
+          SecretsFilter: "eas-config-token-encrypt,eas-config-token-sign,eas-cookie-encrypt,eas-cookie-sign,eas-issuer-encrypt,eas-issuer-sign,eas-session-encrypt,eas-encrypt-iv-secret"
       - script: cd $(Build.SourcesDirectory) && ls -lA ..
         displayName: List stuff
+      - script: python -c "import os; print(os.environ['Build.SourceDirectory'])"
+        displayName: Python-test
 
