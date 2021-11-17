@@ -104,4 +104,5 @@ jobs:
           EAS_ENCRYPT_SECRET: $(eas-config-token-encrypt)
           EAS_SIGN_SECRET: $(eas-config-token-sign)
           EAS_IV_SECRET: $(eas-encrypt-iv-secret)
+          MANAGED_BY: "CICD agent"
 

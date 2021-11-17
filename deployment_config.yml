@@ -11,12 +11,11 @@ spec:
       - "27d04248-2ca5-45ee-903c-2d89a7652b5a"
   service:
     - name: whoami
-      host: "whoami.{env}.oceandata.xyz"
+      host: "whoami123.{env}.oceandata.xyz"
       port: 80
       image:
-        #name: oceandata.azurecr.io/app-template
         name: traefik/whoami
-        tag: "{image_tag}"
+        tag: latest
       resources:
         cpu: 100m
         memory: 64Mi
