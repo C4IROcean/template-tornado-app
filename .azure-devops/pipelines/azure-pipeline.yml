@@ -64,7 +64,9 @@ jobs:
         path: app-deployer
 #       - script: echo "##vso[task.setvariable variable=environment]prod"
 #         displayName: Set environment tag to PROD
-        condition: or(eq(variables.isMaster, true), eq(variables.isTag, true))
+#         condition: or(eq(variables.isMaster, true), eq(variables.isTag, true))
+      - script: echo "##vso[task.setvariable variable=environment]dev"
+        displayName: Set environment tag to DEV
       - script: echo "##vso[task.setvariable variable=vault_name]kv-${ENVIRONMENT}-main"
         displayName: Set Azure Vault name
       - task: UsePythonVersion@0
