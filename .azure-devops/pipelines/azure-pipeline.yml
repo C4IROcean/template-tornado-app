@@ -85,6 +85,8 @@ jobs:
         displayName: List stuff
       - script: export BUILD_DIR=$(Build.SourcesDirectory)
         displayName: Set environment variable
+      - script: env | sort
+        displayName: Print environment variables
       - script: python -c "import os; print(os.environ['BUILD_DIR'])"
         displayName: Python-test
 
