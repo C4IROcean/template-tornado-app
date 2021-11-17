@@ -78,12 +78,13 @@ jobs:
         displayName: Install dependencies
       - task: AzureCLI@2
         displayName: Azure CLI
-        azureSubscription: $(azure_subsription_connection)
-        scriptType: bash
-        scriptLocation: inlineScript
-        inlineScript: |
-          az --version
-          az aks get-credentials --resource-group rg-$(environment)-kubernetes --name arck-$(environment)-odp
+        inputs:
+          azureSubscription: $(azure_subsription_connection)
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            az --version
+            az aks get-credentials --resource-group rg-$(environment)-kubernetes --name arck-$(environment)-odp
       - task: AzureKeyVault@1
         inputs:
           azureSubscription: $(azure_subsription_connection)
