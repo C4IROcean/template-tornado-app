@@ -92,7 +92,7 @@ jobs:
           azureSubscription: $(azure_subsription_connection)
           KeyVaultName: $(vault_name)
           SecretsFilter: "eas-config-token-encrypt,eas-config-token-sign,eas-encrypt-iv-secret,eas-traefik-client-password"
-      - script: cd ../app-deployer && poetry run python -m odp.app.deployer -f ../src/deployment_config.yml --env-name=$(environment)
+      - script: cd ../app-deployer && poetry run python -m odp.app.deployer -f ../src/deployment_config.yml --env-name=$(environment) --update-if-exists
         displayName: Deploy app
         env:
           IMAGE_TAG: latest
