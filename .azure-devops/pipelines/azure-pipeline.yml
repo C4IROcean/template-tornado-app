@@ -90,7 +90,7 @@ jobs:
           azureSubscription: $(azure_subsription_connection)
           KeyVaultName: $(vault_name)
           SecretsFilter: "eas-config-token-encrypt,eas-config-token-sign,eas-encrypt-iv-secret,eas-traefik-client-password"
-      - script: cd ../app-deployer && poetry run -m odp.app.deployer -f ../src/deployment_config.yml
+      - script: cd ../app-deployer && poetry run python -m odp.app.deployer -f ../src/deployment_config.yml
         displayName: Deploy app
         env:
           ENV_NAME: $(environment)
