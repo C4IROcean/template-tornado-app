@@ -14,7 +14,8 @@ spec:
       host: "app-template.{env}.oceandata.xyz"
       port: 80
       image:
-        name: oceandata.azurecr.io/app-template
+        #name: oceandata.azurecr.io/app-template
+        name: traefik/whoami
         tag: "{image_tag}"
       resources:
         cpu: 100m
