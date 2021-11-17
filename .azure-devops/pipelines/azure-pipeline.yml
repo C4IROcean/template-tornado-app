@@ -83,6 +83,8 @@ jobs:
           SecretsFilter: "eas-config-token-encrypt,eas-config-token-sign,eas-cookie-encrypt,eas-cookie-sign,eas-issuer-encrypt,eas-issuer-sign,eas-session-encrypt,eas-encrypt-iv-secret"
       - script: cd $(Build.SourcesDirectory) && ls -lA ..
         displayName: List stuff
-      - script: python -c "import os; print(os.environ['Build.SourceDirectory'])"
+      - script: export BUILD_DIR=$(Build.SourcesDirectory)
+        displayName: Set environment variable
+      - script: python -c "import os; print(os.environ['BUILD_DIR'])"
         displayName: Python-test
 
