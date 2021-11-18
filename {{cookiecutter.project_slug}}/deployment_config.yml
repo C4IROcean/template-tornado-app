@@ -1,0 +1,21 @@
+apiVersion: earth.oceandata/v1alpha1
+kind: Application
+metadata:
+  name: "{{cookiecutter.project_slug.replace('_', '-')}}"
+  namespace: "{{cookiecutter.kubernetes_namespace}}"
+spec:
+  auth:
+    enabled: true
+    app_id: "2a18c352-e7ab-4437-96df-6036d815b3fc"
+    group_ids:
+      - "27d04248-2ca5-45ee-903c-2d89a7652b5a"
+  service:
+    - name: "{{cookiecutter.project_slug.replace('_', '-')}}"
+      host: "{{cookiecutter.url_prefix}}.{env}.oceandata.xyz"
+      port: 80
+      image:
+        name: "oceandata.azurecr.io/{{cookiecutter.project_slug}}"
+        tag: {image_tag}
+      resources:
+        cpu: 100m
+        memory: 64Mi

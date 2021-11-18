@@ -1,0 +1,13 @@
+{
+  "full_name": "Thomas Li Fredriksen",
+  "email": "thomas.fredriksen@oceandata.earth",
+  "github_username": "thomafred",
+  "python_version": ["3.9", "3.8", "3.7"],
+  "project_name": "ODP App Template",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
+  "project_short_description": "Template for creating and deploying apps to the ODP",
+  "kubernetes_namespace": "app-{{ cookiecutter.project_slug.replace('_', '-') }}",
+  "url_prefix": "must_be_unique",
+  "version": "0.1.0",
+  "open_source_license": ["MIT license", "BSD license", "ISC license", "Apache Software License 2.0", "GNU General Public License v3", "Not open source"]
+}
