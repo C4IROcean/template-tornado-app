@@ -14,7 +14,7 @@ spec:
       host: "example.{env}.oceandata.xyz"
       port: 80
       image:
-        name: traefik/app-template
+        name: oceandata.azurecr.io/app-template
         tag: latest
       resources:
         cpu: 100m
