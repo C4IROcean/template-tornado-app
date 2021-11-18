@@ -27,7 +27,7 @@ the [cookiecutter documentation](https://cookiecutter.readthedocs.io/en/latest/i
 Simply run cookiecutter to generate your project:
 
 ```shell
-$ cookiecutter ht+https://oceandatafoundation@dev.azure.com/oceandatafoundation/ODP/_git/app-template
+$ cookiecutter git+https://oceandatafoundation@dev.azure.com/oceandatafoundation/ODP/_git/app-template
 ```
 
 Cookiecutter will prompt your to input some options, then finally generate a new directory containing the full project
