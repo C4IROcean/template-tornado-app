@@ -17,11 +17,11 @@ variables:
   docker_repository: "{{cookiecutter.project_slug}}"
   isMaster: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))]
   isTag: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
-  ${% raw %}{{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}:
+  ${% raw %}{{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}{% endraw %}:
     image_tag: latest
-  ${% raw %}{{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
+  ${% raw %}{{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}{% endraw %}:
     image_tag: $[variables['Build.SourceBranchName']]
-  ${% raw %}{{ if not(or(startsWith(variables['Build.SourceBranch'], 'refs/tags/'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))) }}:
+  ${% raw %}{{ if not(or(startsWith(variables['Build.SourceBranch'], 'refs/tags/'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))) }}{% endraw %}:
     image_tag: $[variables['Build.SourceVersion']]
 
 jobs:
