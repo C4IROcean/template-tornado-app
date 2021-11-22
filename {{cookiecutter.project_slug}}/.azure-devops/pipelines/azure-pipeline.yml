@@ -17,11 +17,15 @@ variables:
   docker_repository: "{{cookiecutter.project_slug}}"
   isMaster: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))]
   isTag: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
+  ${{ if or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}:
+    image_tag: latest
+  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
+    image_tag: $[variables['Build.SourceBranchName']]
+  ${{ if not(or(startsWith(variables['Build.SourceBranch'], 'refs/tags/'), eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))) }}:
+    image_tag: $[variables['Build.SourceVersion']]
 
 jobs:
   - job: Build
-    variables:
-      image_tag: dev
     steps:
       - checkout: self
         fetchDepth: 3
@@ -29,15 +33,6 @@ jobs:
       - script: echo "##vso[task.setvariable variable=environment]prod"
         displayName: Set environment to PROD
         condition: eq(variables.isTag, true)
-      - script: VERSION_TAG=`git describe --tags` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
-        displayName: Set image image tag to latest git tag
-        condition: eq(variables.isTag, true)
-      - script: echo "##vso[task.setvariable variable=image_tag]latest"
-        displayName: Set image tag to latest
-        condition: eq(variables.isMaster, true)
-      - script: VERSION_TAG=`git rev-parse --short HEAD` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
-        displayName: Set the git tag to git hash
-        condition: and(eq(variables.isTag, false), eq(variables.isMaster, false))
       - task: Docker@2
         displayName: Build image to container registry
         inputs:
@@ -51,7 +46,6 @@ jobs:
   - job: Deploy
     dependsOn: Build
     variables:
-      image_tag: $[ dependencies.Build.outputs['outputImageTag.outputImageTagVariable'] ]
       environment: dev
       vault_name: kv-dev-main
     steps:
@@ -69,15 +63,6 @@ jobs:
         displayName: Set environment tag to DEV
       - script: echo "##vso[task.setvariable variable=vault_name]kv-${ENVIRONMENT}-main"
         displayName: Set Azure Vault name
-      - script: VERSION_TAG=`git describe --tags` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
-        displayName: Set image image tag to latest git tag
-        condition: eq(variables.isTag, true)
-      - script: echo "##vso[task.setvariable variable=image_tag]latest"
-        displayName: Set image tag to latest
-        condition: eq(variables.isMaster, true)
-      - script: VERSION_TAG=`cd ../src && git rev-parse --short HEAD` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
-        displayName: Set the git tag to git hash
-        condition: and(eq(variables.isTag, false), eq(variables.isMaster, false))
       - task: UsePythonVersion@0
         inputs:
           versionSpec: "{{cookiecutter.python_version}}"
