@@ -38,9 +38,6 @@ jobs:
       - script: VERSION_TAG=`git rev-parse --short HEAD` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
         displayName: Set the git tag to git hash
         condition: and(eq(variables.isTag, false), eq(variables.isMaster, false))
-      - script: echo $(image_tag)
-        name: outputImageTag
-        displayName: Print Image tag
       - task: Docker@2
         displayName: Build image to container registry
         inputs:
@@ -72,6 +69,15 @@ jobs:
         displayName: Set environment tag to DEV
       - script: echo "##vso[task.setvariable variable=vault_name]kv-${ENVIRONMENT}-main"
         displayName: Set Azure Vault name
+      - script: VERSION_TAG=`git describe --tags` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
+        displayName: Set image image tag to latest git tag
+        condition: eq(variables.isTag, true)
+      - script: echo "##vso[task.setvariable variable=image_tag]latest"
+        displayName: Set image tag to latest
+        condition: eq(variables.isMaster, true)
+      - script: VERSION_TAG=`git rev-parse --short HEAD` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
+        displayName: Set the git tag to git hash
+        condition: and(eq(variables.isTag, false), eq(variables.isMaster, false))
       - task: UsePythonVersion@0
         inputs:
           versionSpec: "{{cookiecutter.python_version}}"
