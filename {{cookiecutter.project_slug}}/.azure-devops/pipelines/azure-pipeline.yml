@@ -72,22 +72,20 @@ jobs:
         displayName: Install and Poetry
       - script: cd ../app-deployer && poetry install
         displayName: Install dependencies
+      - task: AzureKeyVault@1
+        inputs:
+          azureSubscription: $(azure_subsription_connection)
+          KeyVaultName: $(vault_name)
+          SecretsFilter: "eas-config-token-encrypt,eas-config-token-sign,eas-encrypt-iv-secret,eas-traefik-client-password"
       - task: AzureCLI@2
-        displayName: Azure CLI
+        displayName: Deploy app
         inputs:
           azureSubscription: $(azure_subsription_connection)
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
             az --version
-            az aks get-credentials --resource-group rg-$(environment)-kubernetes --name arck-$(environment)-odp
-      - task: AzureKeyVault@1
-        inputs:
-          azureSubscription: $(azure_subsription_connection)
-          KeyVaultName: $(vault_name)
-          SecretsFilter: "eas-config-token-encrypt,eas-config-token-sign,eas-encrypt-iv-secret,eas-traefik-client-password"
-      - script: cd ../app-deployer && poetry run python -m odp.app.deployer -f ../src/deployment_config.yml --env-name=$(environment) --update-if-exists --image-tag=$(image_tag)
-        displayName: Deploy app
+            cd ../app-deployer && poetry run python -m odp.app.deployer -f ../src/deployment_config.yml --env-name=$(environment) --update-if-exists --image-tag=$(image_tag)
         env:
           PROXY_SSL_DOMAIN: "*.$(environment).oceandata.xyz"
           PROXY_CERT_RESOLVER: letsencrypt
