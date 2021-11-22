@@ -75,7 +75,7 @@ jobs:
       - script: echo "##vso[task.setvariable variable=image_tag]latest"
         displayName: Set image tag to latest
         condition: eq(variables.isMaster, true)
-      - script: VERSION_TAG=`git rev-parse --short HEAD` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
+      - script: VERSION_TAG=`cd ../src && git rev-parse --short HEAD` && echo "##vso[task.setvariable variable=image_tag]$VERSION_TAG"
         displayName: Set the git tag to git hash
         condition: and(eq(variables.isTag, false), eq(variables.isMaster, false))
       - task: UsePythonVersion@0
