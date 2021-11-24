@@ -85,6 +85,7 @@ jobs:
           scriptLocation: inlineScript
           inlineScript: |
             az --version
+            az aks get-credentials --resource-group rg-$(environment)-kubernetes --name arck-$(environment)-odp
             cd ../app-deployer && poetry run python -m odp.app.deployer -f ../src/deployment_config.yml --env-name=$(environment) --update-if-exists --image-tag=$(image_tag)
         env:
           PROXY_SSL_DOMAIN: "*.$(environment).oceandata.xyz"
