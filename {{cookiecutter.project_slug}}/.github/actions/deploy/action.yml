@@ -1,0 +1,83 @@
+name: "Deploy"
+description: "Deploy image using agent ocean"
+inputs:
+  environment:
+    description: Environment name
+    required: true
+  azure-client-id:
+    description: Azure Client ID
+    required: true
+  azure-tenant-id:
+    description: Azure Tenant ID
+    required: true
+  azure-subscription-id:
+    description: Azure Subscription ID
+    required: true
+  aks-resource-group:
+    description: Azure AKS resource group name
+    required: true
+  aks-cluster:
+    description: Azure AKS cluster name
+    required: true
+  agent-ocean-deploy-key:
+    description: Agent Ocean GH deploy key
+    required: true
+  image-tag:
+    description: Docker image tag
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: AZ CLI Login
+      uses: azure/login@v1
+      with:
+        client-id: ${{ inputs.azure-client-id }}
+        tenant-id: ${{ inputs.azure-tanant-id }}
+        subscription-id: ${{ inputs.azure-subscription-id }}
+    - name: Get EAS secrets
+      id: eas-secrets
+      uses: Azure/get-keyvault-secrets@v1
+      with:
+        keyvault: "kv-dev-main"
+        secrets: "eas-config-token-encrypt,eas-config-token-sign,eas-encrypt-iv-secret,eas-traefik-client-password"
+    - name: Set AKS context
+      uses: azure/aks-set-context@v2
+      with:
+        resource-group: ${{ inputs.aks-resource-group }}
+        cluster-name: ${{ inputs.aks-cluster }}
+    - name: Prepare Python
+      run: python -m pip install -U pip setuptools wheel
+      shell: bash
+    - name: Install poetry
+      run: python -m pip install poetry
+      shell: bash
+    - name: Checkout Agent Ocean
+      uses: actions/checkout@v3
+      with:
+        repository: C4IROcean/agent-ocean
+        path: agent-ocean
+        ssh-key: ${{ inputs.agent-ocean-deploy-key }}
+    - name: Install dependencies
+      run: cd agent-ocean && poetry install
+      shell: bash
+    - name: Checkout App
+      uses: actions/checkout@v3
+      with:
+        path: app
+    - name: Deploy app
+      run: |
+        cd $GITHUB_WORKSPACE/agent-ocean && poetry run python -m odp.app.deployer -f $GITHUB_WORKSPACE/app/deployment_config.yml --env-name=${{ inputs.environment }} --update-if-exists --image-tag=${{ inputs.image-tag }}
+      shell: bash
+      env:
+        ENVIRONMENT: ${{ inputs.environment }}
+        PROXY_SSL_DOMAIN: "*.${{ inputs.environment }}.oceandata.xyz"
+        PROXY_CERT_RESOLVER: letsencrypt
+        AUTH_EAS_URL: "eas.${{ inputs.environment }}.oceandata.xyz"
+        AUTH_DOMAIN: "${{ inputs.environment }}.oceandata.xyz"
+        EAS_CLIENT_SECRET:
+          ${{ steps.eas-secrets.outputs.eas-traefik-client-password }}
+        EAS_ENCRYPT_SECRET:
+          ${{ steps.eas-secrets.outputs.eas-config-token-encrypt }}
+        EAS_SIGN_SECRET: ${{ steps.eas-secrets.outputs.eas-config-token-sign }}
+        EAS_IV_SECRET: ${{ steps.eas-secets.outputs.eas-encrypt-iv-secret }}
+        MANAGED_BY: "cicd-agent"
