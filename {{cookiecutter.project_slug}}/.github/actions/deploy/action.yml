@@ -31,9 +31,11 @@ runs:
     - name: AZ CLI Login
       uses: azure/login@v1
       with:
+        {% raw %}
         client-id: ${{ inputs.azure-client-id }}
         tenant-id: ${{ inputs.azure-tanant-id }}
         subscription-id: ${{ inputs.azure-subscription-id }}
+        {% endraw %}
     - name: Get EAS secrets
       id: eas-secrets
       uses: Azure/get-keyvault-secrets@v1
@@ -43,8 +45,10 @@ runs:
     - name: Set AKS context
       uses: azure/aks-set-context@v2
       with:
+      {% raw %}
         resource-group: ${{ inputs.aks-resource-group }}
         cluster-name: ${{ inputs.aks-cluster }}
+      {% endraw %}
     - name: Prepare Python
       run: python -m pip install -U pip setuptools wheel
       shell: bash
@@ -56,7 +60,7 @@ runs:
       with:
         repository: C4IROcean/agent-ocean
         path: agent-ocean
-        ssh-key: ${{ inputs.agent-ocean-deploy-key }}
+        ssh-key: {% raw %}${{ inputs.agent-ocean-deploy-key }}{% endraw %}
     - name: Install dependencies
       run: cd agent-ocean && poetry install
       shell: bash
@@ -66,9 +70,10 @@ runs:
         path: app
     - name: Deploy app
       run: |
-        cd $GITHUB_WORKSPACE/agent-ocean && poetry run python -m odp.app.deployer -f $GITHUB_WORKSPACE/app/deployment_config.yml --env-name=${{ inputs.environment }} --update-if-exists --image-tag=${{ inputs.image-tag }}
+        {% raw %}cd $GITHUB_WORKSPACE/agent-ocean && poetry run python -m odp.app.deployer -f $GITHUB_WORKSPACE/app/deployment_config.yml --env-name=${{ inputs.environment }} --update-if-exists --image-tag=${{ inputs.image-tag }}{% endraw %}
       shell: bash
       env:
+        {% raw %}
         ENVIRONMENT: ${{ inputs.environment }}
         PROXY_SSL_DOMAIN: "*.${{ inputs.environment }}.oceandata.xyz"
         PROXY_CERT_RESOLVER: letsencrypt
@@ -80,4 +85,5 @@ runs:
           ${{ steps.eas-secrets.outputs.eas-config-token-encrypt }}
         EAS_SIGN_SECRET: ${{ steps.eas-secrets.outputs.eas-config-token-sign }}
         EAS_IV_SECRET: ${{ steps.eas-secets.outputs.eas-encrypt-iv-secret }}
+        {% endraw %}
         MANAGED_BY: "cicd-agent"

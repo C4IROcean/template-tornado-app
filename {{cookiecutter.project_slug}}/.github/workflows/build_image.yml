@@ -8,6 +8,7 @@ on:
     types:
       - opened
       - reopened
+      - synchronize
 
 permissions:
   id-token: write
@@ -18,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      tag: ${{ github.sha }}
+      tag: {% raw %}${{ github.sha }}{% endraw %}
 
     steps:
       - uses: actions/checkout@v3
@@ -31,8 +32,8 @@ jobs:
           tags: |
             type=sha,prefix=,suffix=,format=long
             type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={% raw %}{{version}}{% endraw %}
+            type=semver,pattern={% raw %}{{major}}.{{minor}}{% endraw %}
           flavor: |
             latest=true
       - name: Setup Docker Buildx
@@ -40,16 +41,16 @@ jobs:
       - uses: azure/docker-login@v1
         with:
           login-server: oceandata.azurecr.io
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
+          username: {% raw %}${{ secrets.ACR_USERNAME }}{% endraw %}
+          password: {% raw %}${{ secrets.ACR_PASSWORD }}{% endraw %}
       - name: Build and push
         uses: docker/build-push-action@v2
         env:
           DOCKER_BUILDKIT: 1
         with:
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: {% raw %}${{ steps.meta.outputs.tags }}{% endraw %}
+          labels: {% raw %}${{ steps.meta.outputs.labels }}{% endraw %}
 
   deploy-dev:
     needs: build-and-push
@@ -64,9 +65,11 @@ jobs:
       - name: AZ CLI Login
         uses: azure/login@v1
         with:
+          {% raw %}
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          {% endraw %}
       - name: Get EAS secrets
         id: eas-secrets
         uses: Azure/get-keyvault-secrets@v1
@@ -76,8 +79,10 @@ jobs:
       - name: Set AKS context
         uses: azure/aks-set-context@v2
         with:
+          {% raw %}
           resource-group: ${{ secrets.AKS_RESOURCE_GROUP_NAME }}
           cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+          {% endraw %}
       - name: Prepare Python
         run: python -m pip install -U pip setuptools wheel
       - name: Install poetry
@@ -87,7 +92,7 @@ jobs:
         with:
           repository: C4IROcean/agent-ocean
           path: agent-ocean
-          ssh-key: ${{ secrets.AGENT_OCEAN_DEPLOY_KEY }}
+          ssh-key: {% raw %}${{ secrets.AGENT_OCEAN_DEPLOY_KEY }}{% endraw %}
       - name: Install dependencies
         run: cd agent-ocean && poetry install
       - name: Checkout App
@@ -96,13 +101,14 @@ jobs:
           path: app
       - name: Deploy app
         run: |
-          cd $GITHUB_WORKSPACE/agent-ocean && poetry run python -m odp.app.deployer -f $GITHUB_WORKSPACE/app/deployment_config.yml --env-name=dev --update-if-exists --image-tag=${{ needs.build-and-push.outputs.tag }}
+          {% raw %}cd $GITHUB_WORKSPACE/agent-ocean && poetry run python -m odp.app.deployer -f $GITHUB_WORKSPACE/app/deployment_config.yml --env-name=dev --update-if-exists --image-tag=${{ needs.build-and-push.outputs.tag }}{% endraw %}
         env:
           ENVIRONMENT: dev
           PROXY_SSL_DOMAIN: "*.dev.oceandata.xyz"
           PROXY_CERT_RESOLVER: letsencrypt
           AUTH_EAS_URL: "eas.dev.oceandata.xyz"
           AUTH_DOMAIN: "dev.oceandata.xyz"
+          {% raw %}
           EAS_CLIENT_SECRET:
             ${{ steps.eas-secrets.outputs.eas-traefik-client-password }}
           EAS_ENCRYPT_SECRET:
@@ -110,6 +116,7 @@ jobs:
           EAS_SIGN_SECRET:
             ${{ steps.eas-secrets.outputs.eas-config-token-sign }}
           EAS_IV_SECRET: ${{ steps.eas-secrets.outputs.eas-encrypt-iv-secret }}
+          {% endraw %}
           MANAGED_BY: "cicd-agent"
 
   deploy-prod:
@@ -125,9 +132,11 @@ jobs:
       - name: AZ CLI Login
         uses: azure/login@v1
         with:
+          {% raw %}
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          {% endraw %}
       - name: Get EAS secrets
         id: eas-secrets
         uses: Azure/get-keyvault-secrets@v1
@@ -137,8 +146,10 @@ jobs:
       - name: Set AKS context
         uses: azure/aks-set-context@v2
         with:
+          {% raw %}
           resource-group: ${{ secrets.AKS_RESOURCE_GROUP_NAME }}
           cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+          {% endraw %}
       - name: Prepare Python
         run: python -m pip install -U pip setuptools wheel
       - name: Install poetry
@@ -148,7 +159,7 @@ jobs:
         with:
           repository: C4IROcean/agent-ocean
           path: agent-ocean
-          ssh-key: ${{ secrets.AGENT_OCEAN_DEPLOY_KEY }}
+          ssh-key: {% raw %}${{ secrets.AGENT_OCEAN_DEPLOY_KEY }}{% endraw %}
       - name: Install dependencies
         run: cd agent-ocean && poetry install
       - name: Checkout App
@@ -157,13 +168,14 @@ jobs:
           path: app
       - name: Deploy app
         run: |
-          cd $GITHUB_WORKSPACE/agent-ocean && poetry run python -m odp.app.deployer -f $GITHUB_WORKSPACE/app/deployment_config.yml --env-name=prod --update-if-exists --image-tag=${{ needs.build-and-push.outputs.tag }}
+          {% raw %}cd $GITHUB_WORKSPACE/agent-ocean && poetry run python -m odp.app.deployer -f $GITHUB_WORKSPACE/app/deployment_config.yml --env-name=dev --update-if-exists --image-tag=${{ needs.build-and-push.outputs.tag }}{% endraw %}
         env:
           ENVIRONMENT: prod
           PROXY_SSL_DOMAIN: "*.prod.oceandata.xyz"
           PROXY_CERT_RESOLVER: letsencrypt
           AUTH_EAS_URL: "eas.prod.oceandata.xyz"
           AUTH_DOMAIN: "prod.oceandata.xyz"
+          {% raw %}
           EAS_CLIENT_SECRET:
             ${{ steps.eas-secrets.outputs.eas-traefik-client-password }}
           EAS_ENCRYPT_SECRET:
@@ -171,4 +183,5 @@ jobs:
           EAS_SIGN_SECRET:
             ${{ steps.eas-secrets.outputs.eas-config-token-sign }}
           EAS_IV_SECRET: ${{ steps.eas-secrets.outputs.eas-encrypt-iv-secret }}
+          {% endraw %}
           MANAGED_BY: "cicd-agent"
