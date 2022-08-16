@@ -1,15 +1,16 @@
 [tool.poetry]
-name = "ODP App Template"
+name = "ODP Tornado API Template"
 version = "0.1.0"
-description = "ODP App template"
+description = "ODP Tornado web API template"
 authors = ["Thomas Li Fredriksen <thomas.fredriksen@oceandata.earth>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-Flask = "^2.0.2"
 click = "^8.0.3"
 cookiecutter = "^1.7.3"
 typing-extensions = "^4.0.0"
+tornado = "^6.2"
+python-dotenv = "^0.20.0"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.19.0"
