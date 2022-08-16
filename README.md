@@ -1,4 +1,4 @@
-# ODP Flask App template
+# ODP Tornado API template
 
 This template-project includes the basic building blocks needed to deploy and
 application to our platform.
@@ -6,7 +6,7 @@ application to our platform.
 The components of this template:
 
 - Example application
-  - Python flask-application
+  - Python tornado-application
 - Dockerfile
 - Azure DevOps pipeline definition
 
@@ -29,7 +29,7 @@ Windows users may need to do some extra steps. Please refer to the
 Simply run cookiecutter to generate your project:
 
 ```shell
-$ cookiecutter git+https://github.com/C4IROcean/template-flask-app.git
+$ cookiecutter git+https://github.com/C4IROcean/template-tornado-app.git
 ```
 
 Cookiecutter will prompt your to input some options, then finally generate a new
@@ -41,13 +41,13 @@ directory containing the full project and named by cookiecutter based on the
 First clone this project template:
 
 ```shell
-$ git clone https://github.com/C4IROcean/template-flask-app.git template-flask-app
+$ git clone https://github.com/C4IROcean/template-tornado-app.git template-tornado-app
 ```
 
 You can then generate your own project using cookiecutter:
 
 ```shell
-$ cookiecutter <MY_DIR>/template-flask-app
+$ cookiecutter <MY_DIR>/template-tornado-app
 ```
 
 Cookiecutter will prompt your to input some options, then finally generate a new
@@ -65,7 +65,7 @@ some packages to serve as inspiration for app-developers:
   package manager
 - **[Click](https://click.palletsprojects.com/en/8.0.x/options/#boolean-flags)** -
   Parser for command-line arguments
-- **[Flask](https://flask.palletsprojects.com/en/2.0.x/)** - Web-framework for
+- **[Tornado](https://www.tornadoweb.org/en/stable/)** - Async Web-framework for
   Python
 
 ### Dockerfile
