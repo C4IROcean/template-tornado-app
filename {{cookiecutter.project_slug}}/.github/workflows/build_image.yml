@@ -168,7 +168,7 @@ jobs:
           path: app
       - name: Deploy app
         run: |
-          {% raw %}cd $GITHUB_WORKSPACE/agent-ocean && poetry run python -m odp.app.deployer -f $GITHUB_WORKSPACE/app/deployment_config.yml --env-name=dev --update-if-exists --image-tag=${{ needs.build-and-push.outputs.tag }}{% endraw %}
+          {% raw %}cd $GITHUB_WORKSPACE/agent-ocean && poetry run python -m odp.app.deployer -f $GITHUB_WORKSPACE/app/deployment_config.yml --env-name=prod --update-if-exists --image-tag=${{ needs.build-and-push.outputs.tag }}{% endraw %}
         env:
           ENVIRONMENT: prod
           PROXY_SSL_DOMAIN: "*.prod.oceandata.xyz"
