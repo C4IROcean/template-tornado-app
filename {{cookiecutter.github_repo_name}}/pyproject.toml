@@ -3,18 +3,19 @@ name = "{{cookiecutter.project_slug}}"
 version = "{{cookiecutter.version}}"
 description = "{{cookiecutter.project_short_description}}"
 authors = ["{{cookiecutter.full_name}} <{{cookiecutter.email}}>"]
+packages = [
+    {include="odp"}
+]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^{{cookiecutter.python_version}}"
 click = "^8.0.3"
-cookiecutter = "^1.7.3"
 typing-extensions = "^4.0.0"
 tornado = "^6.2"
 python-dotenv = "^0.20.0"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "^2.19.0"
-black = "^22.3.0"
+pytest = "^7.2.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
